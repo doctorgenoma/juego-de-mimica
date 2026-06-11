@@ -1,9 +1,6 @@
-// CharadesGenerator.jsx
-// Juego de Mímica — React + Tailwind CSS
-// Requisitos: React 18+, Tailwind CSS, lucide-react
+// CharadesGenerator.jsx — sin dependencia de Tailwind, CSS inline puro
 
 import React, { useState } from 'react';
-import { Shuffle } from 'lucide-react';
 
 const CharadesGenerator = () => {
   const [currentWord, setCurrentWord] = useState('');
@@ -31,9 +28,7 @@ const CharadesGenerator = () => {
 
   const generateWord = () => {
     const categories = ['animales', 'verbos', 'cosas'];
-    let attempts = 0;
-    let randomWord, randomCategory;
-
+    let attempts = 0, randomWord, randomCategory;
     do {
       randomCategory = categories[Math.floor(Math.random() * categories.length)];
       const wordList = words[difficulty][randomCategory];
@@ -41,152 +36,119 @@ const CharadesGenerator = () => {
       attempts++;
       if (attempts > 50) break;
     } while (usedWords.has(randomWord.toLowerCase()));
-
     setCurrentWord(randomWord);
     setCategory(randomCategory);
     setUsedWords(prev => new Set([...prev, randomWord.toLowerCase()]));
   };
 
-  const resetGame = () => {
-    setCurrentWord('');
-    setCategory('');
-    setUsedWords(new Set());
-  };
+  const resetGame = () => { setCurrentWord(''); setCategory(''); setUsedWords(new Set()); };
 
-  const getDifficultyColor = () => {
-    switch (difficulty) {
-      case 'facil': return 'bg-green-500';
-      case 'medio': return 'bg-yellow-500';
-      case 'dificil': return 'bg-red-500';
-      default: return 'bg-blue-500';
-    }
-  };
+  const totalWords = words[difficulty].animales.length + words[difficulty].verbos.length + words[difficulty].cosas.length;
 
-  const getCategoryEmoji = () => {
-    switch (category) {
-      case 'animales': return '🐾';
-      case 'verbos': return '🎭';
-      case 'cosas': return '📦';
-      default: return '';
-    }
-  };
+  const diffColor = { facil: '#22c55e', medio: '#eab308', dificil: '#ef4444' }[difficulty];
+  const catEmoji = { animales: '🐾', verbos: '🎭', cosas: '📦' }[category] || '';
+  const catName  = { animales: 'Animal', verbos: 'Acción', cosas: 'Objeto' }[category] || '';
 
-  const getCategoryName = () => {
-    switch (category) {
-      case 'animales': return 'Animal';
-      case 'verbos': return 'Acción';
-      case 'cosas': return 'Objeto';
-      default: return '';
-    }
+  const s = {
+    page: { minHeight: '100vh', background: 'linear-gradient(135deg, #a855f7, #ec4899, #f97316)', padding: '2rem', fontFamily: 'sans-serif' },
+    center: { maxWidth: 600, margin: '0 auto' },
+    title: { fontSize: '2.8rem', fontWeight: 900, color: '#fff', textAlign: 'center', marginBottom: '0.5rem', textShadow: '0 2px 8px rgba(0,0,0,0.2)' },
+    subtitle: { color: '#fff', textAlign: 'center', marginBottom: '2rem', fontSize: '1.1rem' },
+    card: { background: '#fff', borderRadius: '1.2rem', padding: '1.5rem', boxShadow: '0 10px 40px rgba(0,0,0,0.15)', marginBottom: '1.2rem' },
+    diffTitle: { fontSize: '1.1rem', fontWeight: 600, color: '#374151', textAlign: 'center', marginBottom: '1rem' },
+    btnRow: { display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap' },
+    wordCard: { background: '#fff', borderRadius: '1.2rem', padding: '3rem 2rem', boxShadow: '0 10px 40px rgba(0,0,0,0.15)', marginBottom: '1.2rem', minHeight: 240, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' },
+    bigWord: { fontSize: '3.5rem', fontWeight: 900, color: '#1f2937', textAlign: 'center', margin: '0.5rem 0' },
+    catLabel: { color: '#9ca3af', fontSize: '1rem' },
+    progressWrap: { marginTop: '1.2rem', textAlign: 'center' },
+    progressText: { fontSize: '0.8rem', color: '#9ca3af', marginBottom: 6 },
+    progressBar: { width: 240, height: 8, background: '#e5e7eb', borderRadius: 999, overflow: 'hidden', margin: '0 auto' },
+    progressFill: (pct) => ({ height: '100%', width: `${pct}%`, background: 'linear-gradient(90deg, #a855f7, #ec4899)', borderRadius: 999, transition: 'width 0.5s' }),
+    placeholder: { textAlign: 'center' },
+    placeholderEmoji: { fontSize: '5rem', marginBottom: '1rem' },
+    placeholderText: { fontSize: '1.3rem', color: '#9ca3af', marginBottom: '0.5rem' },
+    placeholderSub: { fontSize: '0.85rem', color: '#d1d5db' },
+    mainBtn: { width: '100%', background: 'linear-gradient(90deg, #3b82f6, #7c3aed)', color: '#fff', border: 'none', padding: '1.2rem', borderRadius: '1rem', fontWeight: 800, fontSize: '1.4rem', cursor: 'pointer', boxShadow: '0 6px 24px rgba(124,58,237,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', marginBottom: '0.75rem', transition: 'transform 0.1s' },
+    resetBtn: { width: '100%', background: '#4b5563', color: '#fff', border: 'none', padding: '0.75rem', borderRadius: '0.75rem', fontWeight: 600, fontSize: '1rem', cursor: 'pointer' },
+    instructions: { marginTop: '2rem', background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(8px)', borderRadius: '1.2rem', padding: '1.5rem', color: '#fff' },
+    instrTitle: { fontWeight: 700, fontSize: '1.1rem', marginBottom: '0.75rem' },
+    ol: { paddingLeft: '1.2rem', lineHeight: 2 },
+    instrNote: { marginTop: '0.75rem', fontSize: '0.85rem', opacity: 0.9 },
   };
-
-  const totalWords =
-    words[difficulty].animales.length +
-    words[difficulty].verbos.length +
-    words[difficulty].cosas.length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 p-8">
-      <div className="max-w-2xl mx-auto">
-        <h1 className="text-5xl font-bold text-white text-center mb-4 drop-shadow-lg">
-          🎭 Juego de Mímica
-        </h1>
-        <p className="text-white text-center mb-8 text-lg">¡Gesticula y adivina!</p>
+    <div style={s.page}>
+      <div style={s.center}>
+        <h1 style={s.title}>🎭 Juego de Mímica</h1>
+        <p style={s.subtitle}>¡Gesticula y adivina!</p>
 
-        {/* Selector de dificultad */}
-        <div className="bg-white rounded-2xl p-6 shadow-2xl mb-6">
-          <h2 className="text-xl font-semibold text-gray-700 mb-4 text-center">
-            Selecciona la dificultad
-          </h2>
-          <div className="flex gap-3 justify-center flex-wrap">
-            {[
-              { key: 'facil', label: '⭐ Fácil', active: 'bg-green-500' },
-              { key: 'medio', label: '⭐⭐ Medio', active: 'bg-yellow-500' },
-              { key: 'dificil', label: '⭐⭐⭐ Difícil', active: 'bg-red-500' },
-            ].map(({ key, label, active }) => (
+        {/* Dificultad */}
+        <div style={s.card}>
+          <p style={s.diffTitle}>Selecciona la dificultad</p>
+          <div style={s.btnRow}>
+            {[['facil','⭐ Fácil','#22c55e'], ['medio','⭐⭐ Medio','#eab308'], ['dificil','⭐⭐⭐ Difícil','#ef4444']].map(([key, label, color]) => (
               <button
                 key={key}
                 onClick={() => { setDifficulty(key); resetGame(); }}
-                className={`px-6 py-3 rounded-xl font-semibold transition-all transform hover:scale-105 ${
-                  difficulty === key
-                    ? `${active} text-white shadow-lg`
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                }`}
-              >
-                {label}
-              </button>
+                style={{
+                  padding: '0.65rem 1.4rem', borderRadius: '0.75rem', fontWeight: 600, border: 'none', cursor: 'pointer', fontSize: '0.95rem', transition: 'transform 0.1s',
+                  background: difficulty === key ? color : '#e5e7eb',
+                  color: difficulty === key ? '#fff' : '#374151',
+                  boxShadow: difficulty === key ? `0 4px 14px ${color}88` : 'none',
+                }}
+              >{label}</button>
             ))}
           </div>
         </div>
 
         {/* Tarjeta de palabra */}
-        <div className="bg-white rounded-2xl p-12 shadow-2xl mb-6 min-h-64 flex flex-col items-center justify-center">
+        <div style={s.wordCard}>
           {currentWord ? (
             <>
-              <div className={`${getDifficultyColor()} text-white px-4 py-2 rounded-full text-sm font-semibold mb-4`}>
+              <span style={{ background: diffColor, color: '#fff', borderRadius: 999, padding: '0.3rem 1rem', fontSize: '0.8rem', fontWeight: 700, marginBottom: '0.75rem' }}>
                 {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
-              </div>
-              <div className="text-6xl mb-4">{getCategoryEmoji()}</div>
-              <h2 className="text-6xl font-bold text-gray-800 text-center mb-2">{currentWord}</h2>
-              <p className="text-gray-500 text-lg">({getCategoryName()})</p>
-              <div className="mt-6 text-center">
-                <p className="text-sm text-gray-400">
-                  Palabras únicas: {usedWords.size} / {totalWords}
-                </p>
-                <div className="w-64 bg-gray-200 rounded-full h-2 mt-2">
-                  <div
-                    className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all duration-500"
-                    style={{ width: `${(usedWords.size / totalWords) * 100}%` }}
-                  />
+              </span>
+              <div style={{ fontSize: '3.5rem' }}>{catEmoji}</div>
+              <h2 style={s.bigWord}>{currentWord}</h2>
+              <p style={s.catLabel}>({catName})</p>
+              <div style={s.progressWrap}>
+                <p style={s.progressText}>Palabras únicas: {usedWords.size} / {totalWords}</p>
+                <div style={s.progressBar}>
+                  <div style={s.progressFill((usedWords.size / totalWords) * 100)} />
                 </div>
               </div>
             </>
           ) : (
-            <div className="text-center">
-              <div className="text-8xl mb-4">🎪</div>
-              <p className="text-2xl text-gray-400 mb-2">
-                Pulsa el botón para generar una palabra
-              </p>
-              <p className="text-sm text-gray-500">
-                {totalWords} palabras disponibles en este nivel
-              </p>
+            <div style={s.placeholder}>
+              <div style={s.placeholderEmoji}>🎪</div>
+              <p style={s.placeholderText}>Pulsa el botón para generar una palabra</p>
+              <p style={s.placeholderSub}>{totalWords} palabras disponibles en este nivel</p>
             </div>
           )}
         </div>
 
         {/* Botones */}
-        <div className="space-y-3">
-          <button
-            onClick={generateWord}
-            className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-6 rounded-2xl font-bold text-2xl shadow-2xl hover:shadow-3xl transition-all transform hover:scale-105 flex items-center justify-center gap-3"
-          >
-            <Shuffle size={32} />
-            {currentWord ? 'Generar Nueva Palabra' : 'Comenzar a Jugar'}
-          </button>
-
-          {usedWords.size > 0 && (
-            <button
-              onClick={resetGame}
-              className="w-full bg-gray-600 text-white py-3 rounded-xl font-semibold shadow-lg hover:bg-gray-700 transition-all"
-            >
-              Reiniciar Juego
-            </button>
-          )}
-        </div>
+        <button style={s.mainBtn} onClick={generateWord}
+          onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.03)'}
+          onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+        >
+          🔀 {currentWord ? 'Generar Nueva Palabra' : 'Comenzar a Jugar'}
+        </button>
+        {usedWords.size > 0 && (
+          <button style={s.resetBtn} onClick={resetGame}>Reiniciar Juego</button>
+        )}
 
         {/* Instrucciones */}
-        <div className="mt-8 bg-white bg-opacity-20 backdrop-blur-sm rounded-2xl p-6 text-white">
-          <h3 className="font-bold text-xl mb-3">📋 Cómo jugar:</h3>
-          <ol className="space-y-2 list-decimal list-inside">
+        <div style={s.instructions}>
+          <p style={s.instrTitle}>📋 Cómo jugar:</p>
+          <ol style={s.ol}>
             <li>Elige el nivel de dificultad apropiado</li>
             <li>Pulsa el botón para generar una palabra</li>
             <li>¡Gesticula la palabra sin hablar ni hacer sonidos!</li>
             <li>Los demás jugadores deben adivinar qué palabra es</li>
             <li>Genera una nueva palabra cuando estén listos</li>
           </ol>
-          <p className="mt-4 text-sm opacity-90">
-            ✨ El sistema evita repetir palabras. Pulsa "Reiniciar" para empezar de nuevo.
-          </p>
+          <p style={s.instrNote}>✨ El sistema evita repetir palabras. Pulsa "Reiniciar" para empezar de nuevo.</p>
         </div>
       </div>
     </div>
